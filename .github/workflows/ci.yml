@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify:
+    name: Verify repository files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify README and SQL files
+        run: |
+          echo "Checking repository for required files..."
+          if [ ! -f README.md ]; then
+            echo "ERROR: README.md not found" >&2
+            exit 1
+          fi
+
+          sql_count=$(find . -type f -name '*.sql' | wc -l | tr -d '[:space:]')
+          echo "Found $sql_count .sql files"
+          if [ "$sql_count" -lt 1 ]; then
+            echo "ERROR: no .sql files found" >&2
+            exit 1
+          fi
+
+          echo "Listing repository root contents:"
+          ls -la
